@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/publish/
+.git/
+.kiro/
+.agents/
+tours-ayacucho-frontend/
+ToursAyacuchoPeruAPI.Tests/
+database/
+README.md
+DEPLOYMENT.md
