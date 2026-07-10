@@ -47,7 +47,7 @@ const Profile = () => {
     }
 
     loadProfile()
-  }, [user?.id])
+  }, [user?.id, user?.rol, updateUser])
 
   useEffect(() => {
     if (!editing) {

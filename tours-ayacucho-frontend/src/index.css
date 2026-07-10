@@ -206,6 +206,10 @@
     @apply max-w-7xl mx-auto;
   }
 
+  .client-layout .page-wrapper {
+    @apply pt-8 lg:pt-10;
+  }
+
   /* ===== FORMS ===== */
   .form-card {
     @apply glass-card p-8 w-full max-w-md mx-auto;

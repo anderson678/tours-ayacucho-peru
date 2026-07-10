@@ -1,4 +1,7 @@
 using ToursAyacuchoPeruAPI.Application.DTOs.Auth;
+using ToursAyacuchoPeruAPI.Application.DTOs.Admin;
+using ToursAyacuchoPeruAPI.Application.DTOs.Packages;
+using ToursAyacuchoPeruAPI.Application.DTOs.Reviews;
 using ToursAyacuchoPeruAPI.Application.DTOs.Reservations;
 using ToursAyacuchoPeruAPI.Application.Validators;
 using ToursAyacuchoPeruAPI.Domain.Enums;
@@ -145,5 +148,29 @@ public class ValidatorTests
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(RegisterPaymentDto.Monto));
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(RegisterPaymentDto.MetodoPago));
         Assert.Contains(result.Errors, e => e.PropertyName == nameof(RegisterPaymentDto.NumReferencia));
+    }
+
+    [Fact]
+    public void PackageValidators_accept_valid_package_and_reject_invalid_fields()
+    {
+        var valid = new CreatePackageDto
+        {
+            Nombre = "Millpu", Destino = "Ayacucho", ImagenUrl = "https://example.com/tour.jpg",
+            PrecioUnitario = 120m, CapacidadTotal = 20, AsientosDisp = 10,
+            FechaInicio = new DateTime(2027, 1, 10), FechaFin = new DateTime(2027, 1, 11)
+        };
+
+        Assert.True(new CreatePackageValidator().Validate(valid).IsValid);
+        var invalid = new UpdatePackageDto { Nombre = "", Destino = "", ImagenUrl = "ftp://invalid", PrecioUnitario = 0, CapacidadTotal = 0, AsientosDisp = -1 };
+        Assert.False(new UpdatePackageValidator().Validate(invalid).IsValid);
+    }
+
+    [Fact]
+    public void Reservation_review_reschedule_and_client_status_validators_reject_invalid_data()
+    {
+        Assert.False(new CreateReservationValidator().Validate(new CreateReservationDto()).IsValid);
+        Assert.False(new CreateReviewValidator().Validate(new CreateReviewDto { Calificacion = 6, Comentario = new string('x', 1001) }).IsValid);
+        Assert.False(new RescheduleRequestValidator().Validate(new RescheduleRequestDto()).IsValid);
+        Assert.False(new UpdateClientStatusValidator().Validate(new UpdateClientStatusDto { Estado = EstadoUsuario.Bloqueado }).IsValid);
     }
 }

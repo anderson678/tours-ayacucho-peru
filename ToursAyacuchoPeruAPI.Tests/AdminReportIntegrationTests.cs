@@ -163,7 +163,7 @@ public class AdminReportIntegrationTests : IAsyncLifetime
 
     private static string CreateJwt(Guid userId, RolUsuario role)
     {
-        const string secret = "CLAVE_SECRETA_DESARROLLO_TOURS_AYACUCHO_PERU_2026_123456";
+        const string secret = "TEST_JWT_SECRET_FOR_INTEGRATION_TESTS_123456789";
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new[]

@@ -98,10 +98,12 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const updateUser = useCallback((updatedData) => {
-    const updated = { ...user, ...updatedData }
-    localStorage.setItem('user_data', JSON.stringify(updated))
-    setUser(updated)
-  }, [user])
+    setUser((currentUser) => {
+      const updated = { ...currentUser, ...updatedData }
+      localStorage.setItem('user_data', JSON.stringify(updated))
+      return updated
+    })
+  }, [])
 
   const isAdmin = ['Administrador', 'Admin'].includes(user?.rol)
   const isAuthenticated = !!token && !!user

@@ -1,5 +1,6 @@
 ﻿// Tarea 1.3 â€” SD-01 a SD-05: ConfiguraciÃ³n inicial del proyecto â€” TOURS AYACUCHO PERÃš
 using System;
+using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +16,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.DataProtection;
 using ToursAyacuchoPeruAPI.Infrastructure.Persistence;
 using ToursAyacuchoPeruAPI.Presentation.Middleware;
 using ToursAyacuchoPeruAPI.Infrastructure.Configuration;
@@ -23,6 +25,23 @@ using ToursAyacuchoPeruAPI.Infrastructure.Services;
 using ToursAyacuchoPeruAPI.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// En desarrollo las claves de Data Protection se mantienen junto a la API.
+// Esto evita reutilizar claves DPAPI del perfil de Windows que pudieron crearse
+// con otro usuario/proceso y que impedían responder las solicitudes locales.
+if (builder.Environment.IsDevelopment())
+{
+    var dataProtectionKeysDirectory = new DirectoryInfo(
+        Path.Combine(builder.Environment.ContentRootPath, "App_Data", "DataProtection-Keys"));
+
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(dataProtectionKeysDirectory);
+
+    // EventLog requiere permisos que una ejecución local normal no siempre tiene.
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+}
 
 // 1. Configurar Base de Datos con SQL Server
 // NOTA: el esquema de la base de datos se crea y mantiene mediante el script
@@ -231,5 +250,4 @@ app.MapControllers();
 app.Run();
 
 public partial class Program { }
-
 

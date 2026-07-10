@@ -72,6 +72,29 @@ public class ReservationServiceTests
             () => service.GetByIdAsync(Guid.NewGuid(), reservation.ReservaId));
     }
 
+    [Fact]
+    public async Task GetAllForAdminAsync_filters_reservations_and_maps_client_and_package_data()
+    {
+        await using var db = TestDb.Create();
+        var client = new Usuario
+        {
+            UsuarioId = Guid.NewGuid(), Nombre = "Ana", Correo = "ana@test.com", HashPassword = "hash", Telefono = "987654321",
+            Rol = RolUsuario.Cliente, Estado = EstadoUsuario.Activo, FechaRegistro = DateTime.UtcNow
+        };
+        var package = CreatePackage();
+        db.Usuarios.Add(client);
+        db.PaquetesTuristicos.Add(package);
+        db.Reservas.Add(CreateReservation(client.UsuarioId, package.PaqueteId, EstadoReserva.CONFIRMADA));
+        await db.SaveChangesAsync();
+
+        var result = (await new ReservationService(db).GetAllForAdminAsync("confirmada", package.PaqueteId)).ToList();
+
+        Assert.Single(result);
+        Assert.Equal("Ana", result[0].ClienteNombre);
+        Assert.Equal(package.Nombre, result[0].PaqueteNombre);
+        Assert.Equal("Sin pago", result[0].PagoEstado);
+    }
+
     private static PaqueteTuristico CreatePackage()
     {
         return new PaqueteTuristico

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import apiClient, { getApiErrorMessage } from '../api/apiClient'
 import { useAuth } from '../context/AuthContext'
+import AdminLayout from '../components/layout/AdminLayout'
 import { defaultSiteSettings, fetchSiteSettings, getSiteSettings, updateSiteSettings } from '../utils/siteSettings'
 import toast from 'react-hot-toast'
 import {
@@ -14,6 +15,7 @@ import {
   DocumentChartBarIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
+  MapPinIcon,
   PhotoIcon,
   PencilSquareIcon,
   PlusIcon,
@@ -22,6 +24,7 @@ import {
   TrashIcon,
   UserMinusIcon,
   UserPlusIcon,
+  UsersIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 
@@ -107,7 +110,7 @@ const StatCard = ({ label, value, icon: Icon, tone }) => (
 
 const AdminDashboard = () => {
   const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState('reservas')
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [packages, setPackages] = useState([])
   const [clients, setClients] = useState([])
   const [reservations, setReservations] = useState([])
@@ -239,6 +242,11 @@ const AdminDashboard = () => {
 
   const hasSectionErrors = Object.keys(sectionErrors).length > 0
 
+  const changeSection = (section) => {
+    setActiveTab(section)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const resetPackageForm = () => {
     setEditingPackageId(null)
     setPackageForm(emptyPackageForm)
@@ -284,7 +292,7 @@ const AdminDashboard = () => {
   }
 
   const startEditPackage = (pkg) => {
-    setActiveTab('paquetes')
+    changeSection('paquetes')
     setEditingPackageId(pkg.paqueteId)
     setPackageForm({
       nombre: pkg.nombre ?? '',
@@ -446,8 +454,8 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="page-wrapper">
-      <div className="container-main animate-fade-in">
+    <AdminLayout activeSection={activeTab} onSectionChange={changeSection}>
+      <div className="animate-fade-in">
         <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="flex items-center gap-3 mb-3">
@@ -491,6 +499,8 @@ const AdminDashboard = () => {
               </section>
             )}
 
+            {activeTab === 'dashboard' && (
+              <>
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <StatCard label="Reservas registradas" value={stats.totalReservations} icon={ClipboardDocumentListIcon} tone="text-primary-400" />
               <StatCard label="Ingresos confirmados" value={formatCurrency(stats.confirmedRevenue)} icon={BanknotesIcon} tone="text-emerald-400" />
@@ -566,25 +576,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </section>
-
-            <div className="mb-8 flex flex-wrap gap-2">
-              {[
-                ['reservas', 'Reservas'],
-                ['paquetes', 'Paquetes'],
-                ['clientes', 'Clientes'],
-                ['portada', 'Portada'],
-                ['reportes', 'Reportes'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setActiveTab(value)}
-                  className={activeTab === value ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+              </>
+            )}
 
             {activeTab === 'reservas' && (
               <section className="glass-card overflow-hidden">
@@ -783,10 +776,13 @@ const AdminDashboard = () => {
                   </div>
                 </form>
 
-                <div className="glass-card overflow-hidden">
-                  <div className="p-5 border-b border-white/10 flex items-center justify-between">
-                    <h2 className="font-display text-xl font-bold text-white">Paquetes turisticos</h2>
-                    <span className="badge-info">{packages.length} registros</span>
+                <div>
+                  <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className="font-display text-xl font-bold text-white">Paquetes turisticos</h2>
+                      <p className="mt-1 text-sm text-gray-400">Revisa cada tour visualmente y actualiza solo los que lo necesiten.</p>
+                    </div>
+                    <span className="badge-info self-start sm:self-auto">{packages.length} registros</span>
                   </div>
                   {sectionErrors.packages ? (
                     <div className="p-10 text-center">
@@ -798,52 +794,77 @@ const AdminDashboard = () => {
                       </button>
                     </div>
                   ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left text-gray-400 px-5 py-4">Nombre</th>
-                          <th className="text-left text-gray-400 px-4 py-4">Destino</th>
-                          <th className="text-right text-gray-400 px-4 py-4">Precio</th>
-                          <th className="text-right text-gray-400 px-4 py-4">Asientos</th>
-                          <th className="text-left text-gray-400 px-4 py-4">Fechas</th>
-                          <th className="text-center text-gray-400 px-4 py-4">Estado</th>
-                          <th className="text-right text-gray-400 px-5 py-4">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                    packages.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center">
+                        <PhotoIcon className="mx-auto mb-4 h-12 w-12 text-gray-500" />
+                        <p className="font-semibold text-white">Aún no hay paquetes creados</p>
+                        <p className="mt-1 text-sm text-gray-400">Crea el primer paquete usando el formulario.</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
                         {packages.map((pkg) => (
-                          <tr key={pkg.paqueteId} className="border-b border-white/5 hover:bg-white/[0.03]">
-                            <td className="px-5 py-4 text-white font-medium">{pkg.nombre}</td>
-                            <td className="px-4 py-4 text-gray-300">{pkg.destino}</td>
-                            <td className="px-4 py-4 text-right text-primary-400 font-semibold">S/ {Number(pkg.precioUnitario).toFixed(2)}</td>
-                            <td className="px-4 py-4 text-right text-gray-300">{pkg.asientosDisp} / {pkg.capacidadTotal}</td>
-                            <td className="px-4 py-4 text-gray-300">
-                              <div className="flex items-center gap-2 whitespace-nowrap">
-                                <CalendarDaysIcon className="w-4 h-4 text-primary-400" />
-                                {formatShortDate(pkg.fechaInicio)} - {formatShortDate(pkg.fechaFin)}
+                          <article key={pkg.paqueteId} className="group overflow-hidden rounded-2xl border border-white/10 bg-dark-800 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-card-hover">
+                            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary-900 to-dark-800">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <PhotoIcon className="h-14 w-14 text-primary-300/30" />
                               </div>
-                            </td>
-                            <td className="px-4 py-4 text-center">{pkg.activo !== false ? <span className="badge-success">Activo</span> : <span className="badge-gray">Inactivo</span>}</td>
-                            <td className="px-5 py-4">
-                              <div className="flex justify-end gap-2">
-                                <button type="button" onClick={() => startEditPackage(pkg)} className="btn-ghost text-xs">
-                                  <PencilSquareIcon className="w-4 h-4" />
-                                  Editar
+                              {pkg.imagenUrl && (
+                                <img
+                                  src={pkg.imagenUrl}
+                                  alt={pkg.nombre}
+                                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  loading="lazy"
+                                  onError={(event) => { event.currentTarget.style.display = 'none' }}
+                                />
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-dark-900/85 via-transparent to-transparent" />
+                              <span className={`absolute left-4 top-4 ${pkg.activo !== false ? 'badge-success' : 'badge-gray'}`}>
+                                {pkg.activo !== false ? 'Activo' : 'Inactivo'}
+                              </span>
+                              <div className="absolute bottom-4 right-4 rounded-xl bg-dark-900/90 px-3 py-1.5 text-sm font-black text-primary-300 shadow-lg backdrop-blur-sm">
+                                S/ {Number(pkg.precioUnitario || 0).toFixed(2)}
+                              </div>
+                            </div>
+
+                            <div className="p-5">
+                              <div className="mb-4">
+                                <h3 className="font-display text-lg font-bold text-white">{pkg.nombre}</h3>
+                                <p className="mt-1 flex items-center gap-1.5 text-sm text-primary-300">
+                                  <MapPinIcon className="h-4 w-4" />
+                                  {pkg.destino}
+                                </p>
+                              </div>
+                              <p className="min-h-[40px] text-sm leading-relaxed text-gray-400 line-clamp-2">
+                                {pkg.descripcion || 'Sin descripción registrada para este paquete.'}
+                              </p>
+
+                              <div className="my-5 grid grid-cols-2 gap-3 border-y border-white/10 py-4 text-sm">
+                                <div className="flex items-center gap-2 text-gray-300">
+                                  <UsersIcon className="h-4 w-4 text-cyan-400" />
+                                  <span><strong className="text-white">{pkg.asientosDisp}</strong> / {pkg.capacidadTotal} cupos</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-gray-300">
+                                  <CalendarDaysIcon className="h-4 w-4 text-cyan-400" />
+                                  <span>{formatShortDate(pkg.fechaInicio)} — {formatShortDate(pkg.fechaFin)}</span>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap gap-2">
+                                <button type="button" onClick={() => startEditPackage(pkg)} className="btn-secondary flex-1 px-4 py-2.5 text-sm">
+                                  <PencilSquareIcon className="h-4 w-4" />
+                                  Actualizar
                                 </button>
                                 {pkg.activo !== false && (
-                                  <button type="button" onClick={() => handleDeactivatePackage(pkg.paqueteId)} className="btn-ghost text-xs text-red-400">
-                                    <TrashIcon className="w-4 h-4" />
-                                    Desactivar
+                                  <button type="button" onClick={() => handleDeactivatePackage(pkg.paqueteId)} className="btn-ghost px-3 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300" aria-label={`Desactivar ${pkg.nombre}`} title="Desactivar paquete">
+                                    <TrashIcon className="h-5 w-5" />
                                   </button>
                                 )}
                               </div>
-                            </td>
-                          </tr>
+                            </div>
+                          </article>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </div>
+                    )
                   )}
                 </div>
               </section>
@@ -1099,7 +1120,7 @@ const AdminDashboard = () => {
           </>
         )}
       </div>
-    </div>
+    </AdminLayout>
   )
 }
 

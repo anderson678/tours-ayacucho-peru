@@ -6,7 +6,6 @@ import {
   CalendarDaysIcon,
   ArrowLeftIcon,
   CheckCircleIcon,
-  ClockIcon,
   UsersIcon,
   ExclamationTriangleIcon,
   ArrowPathIcon,

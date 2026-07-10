@@ -1,5 +1,6 @@
 ﻿// Tarea 1.3 â€” SD-01 a SD-05: Middleware Global de Excepciones â€” TOURS AYACUCHO PERÃš
 using System;
+using System.Data.Common;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -75,6 +76,17 @@ namespace ToursAyacuchoPeruAPI.Presentation.Middleware
                         mensaje = message
                     };
                 }
+            }
+            else if (exception is DbException || exception.InnerException is DbException)
+            {
+                statusCode = HttpStatusCode.ServiceUnavailable;
+                errorCode = "DATABASE_UNAVAILABLE";
+                message = "No se pudo conectar con la base de datos. Verifica que SQL Server esté iniciado y que la configuración local tenga acceso a ToursAyacuchoPeruDB.";
+                responsePayload = new
+                {
+                    error = errorCode,
+                    mensaje = message
+                };
             }
             else
             {

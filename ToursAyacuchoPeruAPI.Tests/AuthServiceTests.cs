@@ -126,6 +126,21 @@ public class AuthServiceTests
         Assert.Equal(user.Correo, result.Correo);
     }
 
+    [Fact]
+    public async Task GetProfileAsync_returns_profile_and_rejects_unknown_client()
+    {
+        await using var db = TestDb.Create();
+        var user = CreateUser();
+        db.Usuarios.Add(user);
+        await db.SaveChangesAsync();
+        var service = new AuthService(db, new FakeJwtService(), new FakeNotificationService());
+
+        var profile = await service.GetProfileAsync(user.UsuarioId);
+
+        Assert.Equal(user.Correo, profile.Correo);
+        await Assert.ThrowsAsync<NotFoundException>(() => service.GetProfileAsync(Guid.NewGuid()));
+    }
+
     private static Usuario CreateUser(
         string correo = "cliente@email.com",
         string password = "Correcta@2026",

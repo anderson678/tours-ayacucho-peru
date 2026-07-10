@@ -1,0 +1,46 @@
+# .NET
+bin/
+obj/
+publish/
+**/bin/
+**/obj/
+**/publish/
+*.user
+*.suo
+*.dll
+*.exe
+*.pdb
+
+# Frontend
+node_modules/
+dist/
+build/
+*.local
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Database local files
+*.bak
+*.mdf
+*.ldf
+
+# IDE and OS
+.agents/
+.vs/
+.vscode/
+.idea/
+*.swp
+*.tmp
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+TestResults/
+ToursAyacuchoPeruAPI/App_Data/

@@ -1,23 +1,18 @@
-﻿-- Tarea 1.1 - SD-01 a SD-05: Base de Datos DDL - TOURS AYACUCHO PERU
+-- TOURS AYACUCHO PERU - Schema DDL y datos iniciales para Azure SQL Database
+-- Ejecute este script conectado directamente a la base de datos de destino.
+-- La base de datos debe crearse previamente desde Azure Portal, Azure CLI o IaC.
+
+-- Tarea 1.1 - SD-01 a SD-05: Base de Datos DDL - TOURS AYACUCHO PERU
 -- ============================================================
 -- TOURS AYACUCHO PERU - Schema DDL
 -- Microsoft SQL Server
 -- ============================================================
-CREATE DATABASE [$(DatabaseName)]
-    COLLATE Modern_Spanish_CI_AS;
-GO
 
-USE [$(DatabaseName)];
-GO
 
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
--- Nivel de aislamiento para control de overbooking y alta concurrencia
-ALTER DATABASE [$(DatabaseName)]
-    SET READ_COMMITTED_SNAPSHOT ON;
-GO
 
 -- ------------------------------------------------------------
 -- Tabla: Usuarios
@@ -296,8 +291,6 @@ GO
 -- ------------------------------------------------------------
 -- Paquetes turisticos iniciales
 -- ------------------------------------------------------------
-USE [$(DatabaseName)];
-GO
 
 -- Paquetes turisticos de prueba para visualizar el catalogo.
 -- El administrador puede editarlos o desactivarlos desde el panel.
@@ -488,6 +481,5 @@ BEGIN
 END;
 GO
 
-USE [$(DatabaseName)];
 SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
 

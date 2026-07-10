@@ -1,11 +1,10 @@
 ﻿import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import apiClient from '../api/apiClient'
+import apiClient, { getApiErrorMessage } from '../api/apiClient'
 import { useAuth } from '../context/AuthContext'
 import { fetchSiteSettings, getSiteSettings } from '../utils/siteSettings'
 import {
   MapPinIcon,
-  StarIcon,
   ClockIcon,
   UsersIcon,
   ArrowRightIcon,
@@ -111,6 +110,27 @@ const PackageCard = ({ pkg, badge }) => {
 }
 
 // â”€â”€â”€ Home Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const testimonials = [
+  {
+    name: 'María G.',
+    initials: 'MG',
+    comment: 'Una experiencia inolvidable. El tour a Millpu fue espectacular.',
+    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80',
+  },
+  {
+    name: 'Carlos R.',
+    initials: 'CR',
+    comment: 'Excelente atención y organización. Tours únicos y equipo profesional.',
+    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80',
+  },
+  {
+    name: 'Laura M.',
+    initials: 'LM',
+    comment: 'Ayacucho es mágico y este tour lo demostró. Totalmente recomendado.',
+    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
+  },
+]
+
 const Home = () => {
   const { isAuthenticated } = useAuth()
   const [siteSettings, setSiteSettings] = useState(getSiteSettings)
@@ -137,7 +157,7 @@ const Home = () => {
         const res = await apiClient.get('/packages')
         setPackages(Array.isArray(res.data) ? res.data : [])
       } catch (err) {
-        setError('No se pudo cargar el catalogo. Verifica la conexion con el servidor.')
+        setError(getApiErrorMessage(err, 'No se pudo cargar el catálogo. Verifica la conexión con el servidor.'))
       } finally {
         setLoading(false)
       }
@@ -244,6 +264,12 @@ const Home = () => {
       {/* â”€â”€â”€ FEATURES â”€â”€â”€ */}
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
+          <div className="mb-10 max-w-2xl">
+            <div className="teal-divider mb-4" />
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-primary-400">Viaja con confianza</p>
+            <h2 className="section-title">Todo listo para tu próxima aventura</h2>
+            <p className="section-subtitle">Atención cercana, conocimiento local y reservas diseñadas para que disfrutes Ayacucho sin preocupaciones.</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
@@ -338,6 +364,78 @@ const Home = () => {
       </section>
 
       {/* â”€â”€â”€ CTA SECTION â”€â”€â”€ */}
+      <section className="px-4 py-20">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <div className="teal-divider mb-4" />
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-primary-400">Nuestra esencia</p>
+            <h2 className="section-title">Sobre Nosotros</h2>
+            <p className="section-subtitle max-w-2xl text-base leading-8">
+              Somos TOURS AYACUCHO PERÚ, una agencia de viajes con más de 10 años de experiencia en la organización de tours culturales, históricos y de naturaleza en la región de Ayacucho. Nuestra misión es brindar experiencias auténticas que conecten a los viajeros con la riqueza cultural, histórica y natural de Huamanga, mientras contribuimos al desarrollo sostenible de las comunidades locales.
+            </p>
+          </div>
+          <div className="glass-card relative overflow-hidden p-7">
+            <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary-500/10 blur-2xl" />
+            <div className="relative">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-primary-400/30 bg-primary-500/10">
+                <GlobeAltIcon className="h-7 w-7 text-primary-300" />
+              </div>
+              <h3 className="font-display text-2xl font-bold text-white">Viajes que dejan huella</h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-400">Creamos recorridos responsables, cercanos y memorables junto a quienes conocen Ayacucho mejor que nadie.</p>
+              <div className="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-5">
+                <div className="rounded-xl bg-white/[0.03] p-3">
+                  <p className="font-display text-xl font-black text-primary-300">10+ años</p>
+                  <p className="mt-1 text-xs text-gray-400">de experiencia</p>
+                </div>
+                <div className="rounded-xl bg-white/[0.03] p-3">
+                  <p className="font-display text-xl font-black text-amber-300">Local</p>
+                  <p className="mt-1 text-xs text-gray-400">compromiso sostenible</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <div className="teal-divider mx-auto mb-4" />
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-primary-400">Experiencias reales</p>
+            <h2 className="section-title">Lo que dicen nuestros viajeros</h2>
+            <p className="section-subtitle">Historias de personas que ya descubrieron la magia de Ayacucho con nosotros.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <article key={testimonial.name} className="glass-card flex h-full flex-col p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary-400/40 hover:shadow-card-hover">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-600 text-sm font-black text-white">
+                      <span>{testimonial.initials}</span>
+                      <img
+                        src={testimonial.photo}
+                        alt={`Foto de ${testimonial.name}`}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="lazy"
+                        onError={(event) => { event.currentTarget.style.display = 'none' }}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-white">{testimonial.name}</h3>
+                      <p className="text-xs text-gray-400">Viajero verificado</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5" aria-label="Calificación de 5 estrellas">
+                    {[1, 2, 3, 4, 5].map((star) => <StarSolid key={star} className="h-4 w-4 text-gold-400" />)}
+                  </div>
+                </div>
+                <p className="mt-auto text-sm leading-relaxed text-gray-300">&ldquo;{testimonial.comment}&rdquo;</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {!isAuthenticated && (
         <section className="py-16 px-4">
           <div className="max-w-3xl mx-auto">

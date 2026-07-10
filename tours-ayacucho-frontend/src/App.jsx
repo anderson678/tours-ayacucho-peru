@@ -1,8 +1,11 @@
 ﻿import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useLocation } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ProtectedRoute from './components/layout/ProtectedRoute'
+import ClientLayout from './components/layout/ClientLayout'
 
 // Pages
 import Home from './pages/Home'
@@ -17,7 +20,27 @@ import Reschedule from './pages/Reschedule'
 import Profile from './pages/Profile'
 import AdminDashboard from './pages/AdminDashboard'
 
+const ClientArea = ({ children }) => <ClientLayout>{children}</ClientLayout>
+
+const ProfileArea = () => {
+  const { isAdmin } = useAuth()
+  return isAdmin ? <Profile /> : <ClientArea><Profile /></ClientArea>
+}
+
 function App() {
+  const location = useLocation()
+  const { isAdmin } = useAuth()
+  const isAdminArea = location.pathname.startsWith('/admin')
+  const isClientArea = !isAdmin && [
+    '/paquetes',
+    '/reservar',
+    '/mis-reservas',
+    '/pago',
+    '/reprogramar',
+    '/perfil',
+  ].some((path) => location.pathname.startsWith(path))
+  const usesDedicatedLayout = isAdminArea || isClientArea
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Toast notifications */}
@@ -51,7 +74,7 @@ function App() {
       />
 
       {/* Navigation */}
-      <Header />
+      {!usesDedicatedLayout && <Header />}
 
       {/* Main content */}
       <div className="flex-1">
@@ -65,7 +88,7 @@ function App() {
             path="/paquetes"
             element={
               <ProtectedRoute requireClient>
-                <Packages />
+                <ClientArea><Packages /></ClientArea>
               </ProtectedRoute>
             }
           />
@@ -75,7 +98,7 @@ function App() {
             path="/reservar/:packageId"
             element={
               <ProtectedRoute requireClient>
-                <CreateReservation />
+                <ClientArea><CreateReservation /></ClientArea>
               </ProtectedRoute>
             }
           />
@@ -83,7 +106,7 @@ function App() {
             path="/mis-reservas"
             element={
               <ProtectedRoute requireClient>
-                <MyReservations />
+                <ClientArea><MyReservations /></ClientArea>
               </ProtectedRoute>
             }
           />
@@ -91,7 +114,7 @@ function App() {
             path="/pago/:reservaId"
             element={
               <ProtectedRoute requireClient>
-                <Payment />
+                <ClientArea><Payment /></ClientArea>
               </ProtectedRoute>
             }
           />
@@ -99,7 +122,7 @@ function App() {
             path="/reprogramar/:reservaId"
             element={
               <ProtectedRoute requireClient>
-                <Reschedule />
+                <ClientArea><Reschedule /></ClientArea>
               </ProtectedRoute>
             }
           />
@@ -107,7 +130,7 @@ function App() {
             path="/perfil"
             element={
               <ProtectedRoute>
-                <Profile />
+                <ProfileArea />
               </ProtectedRoute>
             }
           />
@@ -128,7 +151,7 @@ function App() {
       </div>
 
       {/* Footer */}
-      <Footer />
+      {!usesDedicatedLayout && <Footer />}
     </div>
   )
 }

@@ -1,43 +1,49 @@
-# Scripts de base de datos
+# Base de datos
 
-Ejecuta `ToursAyacuchoPeru.sql` cuando quieras crear la base desde cero. Ese archivo contiene:
+Script SQL para crear la base de datos completa de **TOURS AYACUCHO PERU**.
 
-1. Creacion de la base `ToursAyacuchoPeruDB`.
-2. Creacion de tablas, constraints e indices.
-3. Usuario administrador inicial.
-4. Configuracion inicial de portada.
-5. Paquetes turisticos iniciales.
+Motor recomendado: **Microsoft SQL Server**.
 
-Los archivos numerados sirven para mantenimiento por partes:
+## Archivo principal
 
-- `01_schema.sql`: estructura principal de la base.
-- `02_seed_admin.sql`: crea o actualiza el administrador inicial.
-- `03_seed_packages.sql`: carga paquetes turisticos iniciales.
-- `04_seed_site_settings.sql`: crea o actualiza la configuracion de portada.
-- `migrations/`: cambios incrementales para bases ya existentes.
+```text
+database/
+|-- ToursAyacuchoPeru.sql
+`-- README.md
+```
 
-Para una instalacion nueva usa solo:
+## Como crear la base de datos
+
+Ejecuta este script en SQL Server Management Studio, Azure Data Studio o `sqlcmd`:
 
 ```sql
 database/ToursAyacuchoPeru.sql
 ```
 
-Para actualizar una base existente, ejecuta los scripts incrementales en este orden:
+El script crea la base completa `ToursAyacuchoPeruDB`, incluyendo:
 
-```sql
-database/migrations/2026-07-09_add_user_profile_photo.sql
-database/migrations/2026-07-09_add_package_image_url.sql
-database/migrations/2026-07-09_add_notification_log.sql
-database/migrations/2026-07-09_add_site_settings.sql
-database/migrations/2026-07-09_align_review_rating_type.sql
+- Tablas principales del sistema.
+- Relaciones, constraints e indices.
+- Usuario administrador inicial.
+- Configuracion inicial de portada.
+- Paquetes turisticos iniciales.
+- Soporte para imagenes de paquetes y foto de perfil de usuarios.
+- Registro de notificaciones y comprobantes.
+
+## Administrador inicial
+
+El script crea un usuario administrador para pruebas locales:
+
+```text
+Correo: admin@toursayacuchoperu.com
+Clave:  Admin123@
 ```
 
-Despues puedes ejecutar los seeds que necesites:
+Cambia esta clave despues de la primera ejecucion si usas la base fuera de un entorno local.
 
-```sql
-database/02_seed_admin.sql
-database/03_seed_packages.sql
-database/04_seed_site_settings.sql
-```
+## Notas para GitHub
 
-Nota: el proyecto mantiene el esquema con scripts SQL. Las migraciones EF Core que existen en la API no deben usarse como fuente principal del esquema.
+- No subas respaldos `.bak`.
+- No subas archivos fisicos de SQL Server como `.mdf` o `.ldf`.
+- No subas datos reales de clientes.
+- Si necesitas modificar la estructura de la base, actualiza `ToursAyacuchoPeru.sql` para mantener un unico script oficial.
