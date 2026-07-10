@@ -1,0 +1,20 @@
+# Build
+bin/
+obj/
+*.user
+
+# Secretos locales (NUNCA subir a git)
+# appsettings.Development.json SÍ se versiona: solo contiene un comentario guía,
+# los secretos reales van en `dotnet user-secrets` (ver README.md), no en este archivo.
+appsettings.Local.json
+appsettings.Production.json
+.env
+
+# IDE
+.vs/
+.vscode/
+*.suo
+
+# SO
+.DS_Store
+Thumbs.db
