@@ -7,7 +7,9 @@ obj/
 # appsettings.Development.json SÍ se versiona: solo contiene un comentario guía,
 # los secretos reales van en `dotnet user-secrets` (ver README.md), no en este archivo.
 appsettings.Local.json
-appsettings.Production.json
+# La plantilla de produccion se versiona sin secretos; los valores reales se
+# proporcionan mediante variables de entorno en el hosting.
+!appsettings.Production.json
 .env
 
 # IDE

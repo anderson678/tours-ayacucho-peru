@@ -228,14 +228,13 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // 5. Configurar el pipeline de solicitudes HTTP
-if (app.Environment.IsDevelopment())
+// Swagger queda disponible temporalmente en todos los entornos para la presentacion.
+// En una operacion publica permanente conviene protegerlo o limitarlo a Development.
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TOURS AYACUCHO PERÃš API V1");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TOURS AYACUCHO PERÃš API V1");
+});
 
 // Middleware global de excepciones (debe ejecutarse primero)
 app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -250,4 +249,3 @@ app.MapControllers();
 app.Run();
 
 public partial class Program { }
-

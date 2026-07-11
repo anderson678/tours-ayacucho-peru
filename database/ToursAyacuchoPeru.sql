@@ -3,20 +3,10 @@
 -- TOURS AYACUCHO PERU - Schema DDL
 -- Microsoft SQL Server
 -- ============================================================
-CREATE DATABASE [$(DatabaseName)]
-    COLLATE Modern_Spanish_CI_AS;
-GO
-
-USE [$(DatabaseName)];
-GO
-
+-- MonsterASP.NET: ejecute este script conectado directamente a una base MSSQL
+-- vacia creada previamente en el panel. El script no crea ni cambia de base.
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
-GO
-
--- Nivel de aislamiento para control de overbooking y alta concurrencia
-ALTER DATABASE [$(DatabaseName)]
-    SET READ_COMMITTED_SNAPSHOT ON;
 GO
 
 -- ------------------------------------------------------------
@@ -262,43 +252,8 @@ END;
 GO
 
 -- ------------------------------------------------------------
--- Usuario administrador inicial para operar el panel web.
--- Credenciales temporales:
---   Correo: admin@toursayacuchoperu.com
---   Clave:  Admin123@
--- Cambiar la clave despues de la primera puesta en marcha.
--- ------------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE Correo = 'admin@toursayacuchoperu.com')
-BEGIN
-    INSERT INTO Usuarios (
-        UsuarioId,
-        Nombre,
-        Correo,
-        HashPassword,
-        Telefono,
-        FotoUrl,
-        Rol,
-        Estado
-    )
-    VALUES (
-        NEWID(),
-        N'Administrador TOURS AYACUCHO PERU',
-        'admin@toursayacuchoperu.com',
-        '$2a$12$MxvH86EVxyIwpC2XDImrkeDWoz6sGUw2XWDId/85jZ9NF16rzJl86',
-        '999999999',
-        NULL,
-        'Administrador',
-        'Activo'
-    );
-END;
-GO
-
--- ------------------------------------------------------------
 -- Paquetes turisticos iniciales
 -- ------------------------------------------------------------
-USE [$(DatabaseName)];
-GO
-
 -- Paquetes turisticos de prueba para visualizar el catalogo.
 -- El administrador puede editarlos o desactivarlos desde el panel.
 IF NOT EXISTS (SELECT 1 FROM PaquetesTuristicos WHERE Nombre = N'Ruta Wari y Pampa de Ayacucho')
@@ -488,6 +443,5 @@ BEGIN
 END;
 GO
 
-USE [$(DatabaseName)];
 SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
 
