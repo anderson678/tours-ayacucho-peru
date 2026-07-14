@@ -1,42 +1,36 @@
 # TOURS AYACUCHO PERU
 
-Plataforma web para la gestion de ventas, reservas, pagos, resenas y administracion de paquetes turisticos de **TOURS AYACUCHO PERU**.
+Plataforma web para gestionar paquetes turísticos, reservas, pagos, reseñas y clientes.
 
-El repositorio contiene backend, frontend, scripts de base de datos, pruebas y documentacion de requisitos del proyecto.
+## Tecnologías
 
-## Tecnologias
-
-- Backend: ASP.NET Core / C# (.NET 10)
-- Frontend: React + Vite
+- Backend: ASP.NET Core y C# (.NET 10)
+- Frontend: React y Vite
 - Base de datos: Microsoft SQL Server
 - ORM: Entity Framework Core
-- Autenticacion: JWT
+- Autenticación: JWT
 - Pruebas: xUnit
 
 ## Estructura
 
 ```text
-.
-|-- ToursAyacuchoPeruAPI/        # API backend
-|-- ToursAyacuchoPeruAPI.Tests/  # Pruebas automatizadas
-|-- tours-ayacucho-frontend/     # Aplicacion frontend
-|-- database/                    # Script SQL principal
-|-- .kiro/                       # Requisitos, diseno y tareas del proyecto
-|-- .gitignore
-`-- README.md
+ToursAyacuchoPeruAPI/        API backend
+ToursAyacuchoPeruAPI.Tests/  Pruebas automatizadas
+tours-ayacucho-frontend/     Aplicación frontend
+database/                    Script de base de datos
 ```
 
-## Base de datos
+## Base de datos local
 
-Ejecuta el script principal:
+El script crea las tablas y los datos iniciales, pero no crea la base de datos. Primero crea una base vacía llamada `ToursAyacuchoPeruDB` y después ejecuta:
 
 ```powershell
-sqlcmd -S ".\MSSQLSERVER01" -E -d master -v DatabaseName="ToursAyacuchoPeruDB" -i "database/ToursAyacuchoPeru.sql"
+sqlcmd -S ".\MSSQLSERVER01" -E -d "ToursAyacuchoPeruDB" -i "database/ToursAyacuchoPeru.sql"
 ```
 
-Este script crea la base `ToursAyacuchoPeruDB`, sus tablas, relaciones, datos iniciales, configuracion de portada y paquetes turisticos.
+También puedes abrir `database/ToursAyacuchoPeru.sql` con SQL Server Management Studio y ejecutarlo sobre la base vacía.
 
-## Backend
+## Ejecutar el backend
 
 ```powershell
 cd ToursAyacuchoPeruAPI
@@ -44,13 +38,9 @@ dotnet restore
 dotnet run
 ```
 
-La API se ejecuta localmente en:
+La API local utiliza `http://localhost:5150`. Configura las credenciales mediante variables de entorno o `dotnet user-secrets`; no guardes secretos reales en archivos del repositorio.
 
-```text
-http://localhost:5150
-```
-
-## Frontend
+## Ejecutar el frontend
 
 ```powershell
 cd tours-ayacucho-frontend
@@ -58,23 +48,14 @@ npm install
 npm run dev
 ```
 
-## Configuracion local
+Puedes copiar `.env.example` como `.env` para configurar la URL de la API. El archivo `.env` está excluido de Git.
 
-Antes de ejecutar el backend, configura la cadena de conexion y la clave JWT para tu entorno local. Para evitar subir secretos a GitHub, usa variables de entorno o `dotnet user-secrets`.
-
-Ejemplo:
+## Pruebas y compilación
 
 ```powershell
-cd ToursAyacuchoPeruAPI
-dotnet user-secrets init
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=.\MSSQLSERVER01;Database=ToursAyacuchoPeruDB;Trusted_Connection=True;TrustServerCertificate=True;Encrypt=False;"
-dotnet user-secrets set "JwtSettings:Secret" "CAMBIA_ESTA_CLAVE_LOCAL_DE_AL_MENOS_32_CARACTERES"
+dotnet test ToursAyacuchoPeruAPI.Tests
+cd tours-ayacucho-frontend
+npm run build
 ```
 
-## Documentacion del proyecto
-
-La carpeta `.kiro/` contiene la documentacion usada durante el desarrollo, incluyendo requisitos, diseno y tareas implementadas.
-
-## Limpieza del repositorio
-
-No se incluyen carpetas generadas como `bin/`, `obj/`, `publish/`, `node_modules/` o `dist/`. Estas se regeneran automaticamente al compilar o instalar dependencias.
+La guía opcional para publicar la API está en `DEPLOY_MONSTERASP.md`.

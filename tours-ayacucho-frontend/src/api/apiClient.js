@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5150'
+const configuredApiUrl = import.meta.env.VITE_API_BASE_URL?.trim()
+
+export const API_BASE_URL = (configuredApiUrl || 'https://tours-ayacucho-api.runasp.net')
+  .replace(/\/+$/, '')
 
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
@@ -16,20 +19,41 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    const finalUrl = `${config.baseURL?.replace(/\/+$/, '')}/${config.url?.replace(/^\/+/, '')}`
+    console.info('[API request]', config.method?.toUpperCase(), finalUrl)
     return config
   },
   (error) => Promise.reject(error)
 )
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.info('[API response]', response.status, response.config.url, response.data)
+    return response
+  },
   (error) => {
+    const config = error.config
+    const finalUrl = config
+      ? `${config.baseURL?.replace(/\/+$/, '')}/${config.url?.replace(/^\/+/, '')}`
+      : 'URL no disponible'
+
+    console.error('[API error]', {
+      url: finalUrl,
+      status: error.response?.status ?? 'sin respuesta HTTP',
+      body: error.response?.data ?? error.message,
+      code: error.code,
+    })
+
+    // No destruimos la sesion por un 401 aislado. El panel administrativo carga
+    // varias secciones en paralelo y una sola respuesta no autorizada no implica
+    // que el token almacenado sea invalido. AuthContext controla la expiracion y
+    // el cierre de sesion explicito.
     if (error.response?.status === 401) {
-      localStorage.removeItem('jwt_token')
-      localStorage.removeItem('user_data')
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'
-      }
+      console.warn('[API auth] La API rechazo esta solicitud; se conserva la sesion para diagnostico.', {
+        url: finalUrl,
+        response: error.response.data,
+      })
     }
     return Promise.reject(error)
   }
@@ -39,7 +63,7 @@ export const getApiErrorMessage = (error, fallback = 'Ocurrio un error al proces
   const data = error?.response?.data
   if (!data) {
     return error?.code === 'ERR_NETWORK'
-      ? 'No se pudo conectar con la API. Verifica que el backend este activo en http://localhost:5150.'
+      ? `No se pudo conectar con la API configurada en ${API_BASE_URL}.`
       : fallback
   }
 

@@ -1,49 +1,26 @@
 # Base de datos
 
-Script SQL para crear la base de datos completa de **TOURS AYACUCHO PERU**.
+`ToursAyacuchoPeru.sql` contiene el esquema y los datos iniciales del sistema para Microsoft SQL Server.
 
-Motor recomendado: **Microsoft SQL Server**.
+## Ejecución
 
-## Archivo principal
+1. Crea o selecciona una base de datos vacía.
+2. Ejecuta `ToursAyacuchoPeru.sql` conectado directamente a esa base.
 
-```text
-database/
-|-- ToursAyacuchoPeru.sql
-`-- README.md
+Ejemplo local:
+
+```powershell
+sqlcmd -S ".\MSSQLSERVER01" -E -d "ToursAyacuchoPeruDB" -i "database/ToursAyacuchoPeru.sql"
 ```
 
-## Como crear la base de datos
+El script crea las nueve tablas, relaciones, restricciones, índices, configuración de portada y paquetes turísticos iniciales. No contiene `CREATE DATABASE`, no cambia la base seleccionada y no crea usuarios con contraseñas predeterminadas.
 
-Ejecuta este script en SQL Server Management Studio, Azure Data Studio o `sqlcmd`:
+Para crear el primer administrador, registra una cuenta mediante la API y actualiza su rol de forma controlada:
 
 ```sql
-database/ToursAyacuchoPeru.sql
+UPDATE Usuarios
+SET Rol = 'Administrador'
+WHERE Correo = 'CORREO_REGISTRADO';
 ```
 
-El script crea la base completa `ToursAyacuchoPeruDB`, incluyendo:
-
-- Tablas principales del sistema.
-- Relaciones, constraints e indices.
-- Usuario administrador inicial.
-- Configuracion inicial de portada.
-- Paquetes turisticos iniciales.
-- Soporte para imagenes de paquetes y foto de perfil de usuarios.
-- Registro de notificaciones y comprobantes.
-
-## Administrador inicial
-
-El script crea un usuario administrador para pruebas locales:
-
-```text
-Correo: admin@toursayacuchoperu.com
-Clave:  Admin123@
-```
-
-Cambia esta clave despues de la primera ejecucion si usas la base fuera de un entorno local.
-
-## Notas para GitHub
-
-- No subas respaldos `.bak`.
-- No subas archivos fisicos de SQL Server como `.mdf` o `.ldf`.
-- No subas datos reales de clientes.
-- Si necesitas modificar la estructura de la base, actualiza `ToursAyacuchoPeru.sql` para mantener un unico script oficial.
+No subas respaldos, archivos físicos de SQL Server ni datos reales de clientes al repositorio.

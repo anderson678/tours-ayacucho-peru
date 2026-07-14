@@ -478,7 +478,7 @@ CREATE TABLE ConfiguracionPortada (
 GO
 ```
 
-**Organización vigente de scripts SQL:** el script completo y recomendado para levantar la base desde cero es `database/ToursAyacuchoPeru.sql`. Para revisión incremental se mantiene `database/01_schema.sql`, `database/02_seed_admin.sql`, `database/03_seed_packages.sql`, `database/04_seed_site_settings.sql` y migraciones puntuales en `database/migrations/`.
+**Organización vigente de la base de datos:** el único script de instalación mantenido es `database/ToursAyacuchoPeru.sql`. Contiene las nueve tablas y los datos iniciales, pero no crea ni selecciona una base. Las migraciones de Entity Framework Core se conservan en `ToursAyacuchoPeruAPI/Infrastructure/Persistence/Migrations/`. No existe un usuario administrador predeterminado; la primera cuenta administrativa se obtiene registrando un usuario y actualizando su rol de forma controlada.
 
 ---
 
@@ -1571,6 +1571,12 @@ public class GlobalExceptionMiddleware
 ---
 
 ## Estrategia de Pruebas
+
+### Estado verificado de las pruebas
+
+El proyecto real de pruebas es `ToursAyacuchoPeruAPI.Tests` y utiliza xUnit sobre .NET 10. Al 14 de julio de 2026 contiene pruebas unitarias para autenticación, clientes, reseñas, paquetes, pagos, configuración de portada y validadores, además de pruebas de integración para reservas y reportes administrativos. La última ejecución completó **46 de 46 casos** correctamente.
+
+Las propiedades PBT descritas a continuación forman parte de la estrategia objetivo, pero todavía no están implementadas con FsCheck. También siguen pendientes las pruebas contra SQL Server real, carga, responsividad completa y verificación de producción.
 
 ### Enfoque Dual: Pruebas de Ejemplo + Pruebas Basadas en Propiedades
 

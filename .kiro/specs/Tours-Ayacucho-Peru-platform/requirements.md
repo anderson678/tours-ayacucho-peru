@@ -522,7 +522,7 @@ El alcance del MVP obligatorio abarca cuatro módulos críticos: **Autenticació
 | SD-07: Consulta de Estado de Reservas | Reservas | RF08 | `GET /api/v1/reservations` |
 | SD-08: Gestión de Cuentas (Administrador) | Autenticación | RF09 | `GET/PATCH /api/v1/admin/clients` |
 | SD-09: Comentarios y Calificaciones | Catálogo | RF10 | `POST /api/v1/packages/{id}/reviews` |
-| SD-10: Gestión de Paquetes e Itinerarios | Catálogo | RF11, RF12, RF13 | `GET/POST/PUT /api/v1/packages` |
+| SD-10: Gestión de Paquetes e Itinerarios | Catálogo | RF11, RF12, RF13 | Público: `GET /api/v1/packages`; administración: `GET/POST/PUT/DELETE /api/v1/admin/packages` |
 | SD-11: Notificaciones | Transversal | RF15 | (Evento interno) |
 | SD-12: Reportes de Ventas y Reservas | Administración | RF17 | `GET /api/v1/admin/reports/*` |
 | SD-13: Configuración de Portada | Administración / Portada | RF18 | `GET/PUT /api/v1/*/site-settings` |
@@ -543,4 +543,12 @@ El alcance del MVP obligatorio abarca cuatro módulos críticos: **Autenticació
 
 *Documento generado bajo el paradigma Specification-Driven Development (SSD) con OpenSpec.*
 *Este documento constituye la Single Source of Truth (SSOT) del proyecto TOURS AYACUCHO PERÚ.*
-*Versión: 1.0 — Fecha: 2026*
+## Estado de implementación verificado
+
+- Los 13 Spec Deltas cuentan con implementación funcional en la API y/o el frontend, según corresponda.
+- La API usa ASP.NET Core .NET 10, Entity Framework Core y SQL Server; el frontend usa React con Vite y archivos JavaScript/JSX.
+- El esquema oficial es `database/ToursAyacuchoPeru.sql`, con nueve tablas. El script debe ejecutarse sobre una base vacía creada previamente.
+- La verificación automatizada actual contiene 46 casos backend entre pruebas unitarias y de integración; todos pasaron en la última ejecución del 14 de julio de 2026.
+- Permanecen como validaciones pendientes las propiedades PBT definidas en el diseño, las pruebas con SQL Server real, las pruebas de carga y la validación manual completa de responsividad y despliegue.
+
+*Versión: 1.1 — Actualizado: 14 de julio de 2026*

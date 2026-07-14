@@ -44,3 +44,11 @@ yarn-debug.log*
 yarn-error.log*
 TestResults/
 ToursAyacuchoPeruAPI/App_Data/
+
+# Generated deployment packages
+deploy-monster-*/
+**/publish-monster-clean/
+*.zip
+
+# Publish profiles may contain server credentials
+**/Properties/PublishProfiles/

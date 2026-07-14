@@ -130,18 +130,13 @@ const Login = () => {
 
     if (mode === 'admin') {
       setFormData({
-        correo: 'admin@toursayacuchoperu.com',
-        password: 'Admin123@',
+        correo: '',
+        password: '',
       })
       return
     }
 
-    setFormData((prev) => {
-      if (prev.correo === 'admin@toursayacuchoperu.com') {
-        return { correo: '', password: '' }
-      }
-      return prev
-    })
+    setFormData({ correo: '', password: '' })
   }
 
   const isAdminMode = accessMode === 'admin'
@@ -245,7 +240,7 @@ const Login = () => {
                   type="email"
                   value={formData.correo}
                   onChange={handleChange}
-                  placeholder={isAdminMode ? 'admin@toursayacuchoperu.com' : 'tu@correo.com'}
+                  placeholder={isAdminMode ? 'Correo de administrador' : 'tu@correo.com'}
                   className={`input-field pl-10 ${errors.correo ? 'border-red-500/60' : ''}`}
                   autoComplete="email"
                 />

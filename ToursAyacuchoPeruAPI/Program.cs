@@ -60,9 +60,29 @@ var jwtSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSection);
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
-var secret = jwtSection["Secret"] ?? throw new InvalidOperationException("La clave secreta JWT 'Secret' no fue configurada.");
-var issuer = jwtSection["Issuer"];
-var audience = jwtSection["Audience"];
+var secret = jwtSection["Secret"];
+if (string.IsNullOrWhiteSpace(secret))
+{
+    throw new InvalidOperationException("La clave secreta JWT 'Secret' no fue configurada.");
+}
+
+// Issuer y Audience no son secretos. Usamos valores estables si el proveedor
+// de hosting entrega variables existentes pero vacias.
+var issuer = string.IsNullOrWhiteSpace(jwtSection["Issuer"])
+    ? "ToursAyacuchoPeruAPI"
+    : jwtSection["Issuer"]!;
+var audience = string.IsNullOrWhiteSpace(jwtSection["Audience"])
+    ? "ToursAyacuchoPeruWeb"
+    : jwtSection["Audience"]!;
+
+// JwtService debe emitir el token con los mismos valores efectivos que usa
+// JwtBearer para validarlo.
+builder.Services.PostConfigure<JwtSettings>(settings =>
+{
+    settings.Secret = secret;
+    settings.Issuer = issuer;
+    settings.Audience = audience;
+});
 var key = Encoding.UTF8.GetBytes(secret);
 
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -108,19 +128,37 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// 3. Configurar CORS para la integraciÃ³n del Frontend React
-// Los orÃ­genes permitidos se leen de configuraciÃ³n (appsettings) en vez de aceptar cualquier origen.
-// Configure "AllowedOrigins" en appsettings.json / appsettings.Development.json.
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-    ?? new[] { "http://localhost:5173", "http://localhost:3000" };
+// 3. Configurar CORS para la integraciÃ³n del Frontend React.
+// builder.Configuration combina appsettings y variables de entorno como
+// AllowedOrigins__0, AllowedOrigins__1, etc.
+var configuredOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>();
+
+var allowedOrigins = configuredOrigins?
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim().TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray();
+
+if (allowedOrigins is null || allowedOrigins.Length == 0)
+{
+    allowedOrigins =
+    [
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ];
+}
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 

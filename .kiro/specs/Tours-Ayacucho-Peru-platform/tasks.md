@@ -267,16 +267,16 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
     - _Requisitos: Requisito 2 (criterio 2), RNF02_
 
 - [x] 10. Módulo de Reservas — Frontend React.js (SD-04)
-  - [ ] 11.1 Implementar `services/reservationService.ts` y hook `useReservations`
-    - Crear funciones `createReservation(dto)`, `getMyReservations(filtroEstado?)` y `getReservationDetail(id)` que consumen los endpoints del Reservation_Service
-    - Crear `hooks/useReservations.ts` con manejo de estado de carga, error y datos
+  - [x] 11.1 Integrar reservas mediante `api/apiClient.js` y las páginas React
+    - Consumir creación, listado y detalle de reservas desde `CreateReservation.jsx` y `MyReservations.jsx`
+    - Manejar carga, errores y datos con estado local de React
     - _Requisitos: Requisito 4 (criterio 1), Requisito 7 (criterios 1, 2)_
 
   - [x] 11.2 Implementar `Packages.jsx` con catálogo completo de paquetes para Cliente
     - Listar todos los paquetes activos desde `GET /api/v1/packages` mostrando imagen, nombre, destino, precio y asientos disponibles
     - Mantener la portada con solo 4 paquetes destacados
     - Agregar botón "Reservar" visible sólo para clientes autenticados; redirigir a login si no autenticado
-    - Consumir `services/packageService.ts` para `getPackages()` y `getPackageDetail(id)`
+    - Consumir los endpoints de paquetes mediante `api/apiClient.js`
     - _Requisitos: Requisito 10 (criterio 1), RNF05_
 
   - [x] 11.3 Implementar `CreateReservation.jsx` con flujo de creación de reserva
@@ -293,7 +293,7 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
 
 - [x] 11. Módulo de Pagos — Frontend React.js (SD-05)
   - [x] 12.1 Implementar registro de pago en `Payment.jsx`
-    - Crear funciones `registerPayment(dto)` y `getReceipt(paymentId)` en `paymentService.ts`
+    - Consumir registro de pago y comprobante mediante `api/apiClient.js`
     - Implementar formulario `Payment.jsx` con: monto (pre-llenado de `MontoTotal`), método de pago (select con 4 opciones), número de referencia
     - Manejar HTTP 422 (monto inválido mostrando monto esperado), HTTP 409 (reserva ya confirmada), HTTP 401
     - Al éxito, mostrar confirmación y enlace al comprobante; informar que el comprobante fue enviado al correo
@@ -314,7 +314,7 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
     - Implementar eliminación lógica (`Activo = false`); validar `PrecioUnitario > 0` y `CapacidadTotal > 0`
     - _Requisitos: Requisito 10 (RN-10-01, RN-10-02, RN-10-03, criterios 1–5)_
 
-  - [x] 14.2 Implementar `AdminController` para gestión de cuentas de Cliente
+  - [x] 14.2 Implementar `AdminClientController` para gestión de cuentas de Cliente
     - Crear endpoint `GET /api/v1/admin/clients` con `[Authorize(Roles = "Administrador")]`
     - Crear endpoint `PATCH /api/v1/admin/clients/{clientId}/status` para activar/desactivar con eliminación lógica (`Estado = Inactivo`)
     - Verificar en `LoginAsync` que cuenta `Inactivo` devuelva HTTP 403 con mensaje "cuenta desactivada"
@@ -352,7 +352,7 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
     - _Requisitos: Requisito 11 (RN-11-01, RN-11-02, RN-11-03, criterios 1, 2, 3, 4, 5)_
 
   - [x] 15.2 Implementar job programado para recordatorio 24 horas antes del tour
-    - Crear `TourReminderJob` usando `IHostedService` o librería `Hangfire`
+    - Crear `TourReminderBackgroundService` mediante `BackgroundService`
     - Consultar reservas con estado `Confirmada` cuya `FechaInicio` sea igual a `UtcNow + 24h`
     - Invocar `SendTourReminderAsync` para cada reserva encontrada
     - _Requisitos: Requisito 11 (RN-11-02, criterio 4)_
@@ -375,9 +375,9 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
 
 - [x] 17. Organización final de scripts SQL y documentación de base de datos
   - Consolidar el script completo de instalación en `database/ToursAyacuchoPeru.sql`
-  - Separar scripts mantenibles en `database/01_schema.sql`, `database/02_seed_admin.sql`, `database/03_seed_packages.sql` y `database/04_seed_site_settings.sql`
-  - Mover cambios incrementales a `database/migrations/2026-07-09_add_user_profile_photo.sql`
-  - Actualizar `database/README.md` para indicar el orden de ejecución recomendado
+  - Mantener un único script SQL oficial, sin variantes duplicadas ni credenciales predeterminadas
+  - Mantener las migraciones EF Core en `ToursAyacuchoPeruAPI/Infrastructure/Persistence/Migrations/`
+  - Actualizar `database/README.md` con la ejecución correcta sobre una base vacía
   - _Requisitos: Requisito 3, Requisito 10, Requisito 13, RNF03_
 
 
@@ -420,25 +420,25 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
 | 7.4* | SD-06 | Pruebas PBT | **Propiedad 10**: Atomicidad de TX de reprogramación ante fallo |
 | 7.5 | SD-06 | Backend | `ReservationController.Reschedule` (PATCH endpoint) |
 | 7.6* | SD-06 | Pruebas Unit. | Casos límite: segunda reprogramación, fecha pasada, sin disponibilidad |
-| 10.1 | SD-01, SD-02 | Frontend | Cliente Axios con interceptores JWT + `authService.ts` |
+| 10.1 | SD-01, SD-02 | Frontend | Cliente Axios con interceptores JWT en `apiClient.js` |
 | 10.2 | SD-02 | Frontend | `AuthContext.jsx` + hook `useAuth.js` |
 | 10.3 | SD-01 | Frontend | `Register.jsx` con validación cliente y manejo de errores |
 | 10.4 | SD-02 | Frontend | `Login.jsx` con redirección por rol |
 | 10.5 | SD-02 | Frontend | `ProtectedRoute` + `AdminRoute` + configuración de rutas |
-| 11.1 | SD-04, SD-07 | Frontend | `reservationService.ts` + hook `useReservations` |
+| 11.1 | SD-04, SD-07 | Frontend | Integración de reservas mediante `apiClient.js` y páginas React |
 | 11.2 | SD-10 | Frontend | `Packages.jsx`: catálogo completo para Cliente + portada con 4 destacados |
 | 11.3 | SD-04 | Frontend | `CreateReservation.jsx`: flujo de creación con cálculo de monto |
 | 11.4 | SD-07 | Frontend | `MyReservations.jsx` con filtros de estado y badges |
 | 12.1 | SD-05 | Frontend | `Payment.jsx` con manejo de errores |
 | 13.1 | SD-06 | Frontend | `Reschedule.jsx` con validación visual de ventana 12h |
 | 14.1 | SD-10 | Backend | `PackageService` + `PackageController` (CRUD + eliminación lógica) |
-| 14.2 | SD-08 | Backend | `AdminController`: listar clientes + activar/desactivar cuentas |
+| 14.2 | SD-08 | Backend | `AdminClientController`: listar clientes + activar/desactivar cuentas |
 | 14.3 | SD-10 | Frontend | `AdminDashboard.jsx`: formularios CRUD de paquetes para Administrador |
 | 14.4* | SD-08 | Pruebas Unit. | Control de acceso por rol: HTTP 403 para rol incorrecto y cuenta inactiva |
 | 14.5 | SD-13 | Backend/Frontend | `SiteSettingsService` + pestaña Portada en `AdminDashboard.jsx` |
 | 14.6 | SD-03 | Backend/Frontend/BD | Perfil con `FotoUrl`, avatar en Header y edición en `Profile.jsx` |
 | 15.1 | SD-11 | Backend | `NotificationService` SMTP con política de reintentos y deduplicación |
-| 15.2 | SD-11 | Backend | `TourReminderJob` con `IHostedService` para recordatorio 24h |
+| 15.2 | SD-11 | Backend | `TourReminderBackgroundService` para recordatorio 24h |
 | 16.1 | SD-12 | Backend | `AdminReportController` + `ReportService` con generación PDF/XLSX en ≤ 30s |
 | 17 | SD-03, SD-10, SD-13 | Base de Datos | `database/ToursAyacuchoPeru.sql`, seeds, migraciones y README |
 
@@ -450,11 +450,11 @@ Las pruebas basadas en propiedades (PBT) con FsCheck validan invariantes univers
 ## Estado actual de implementación
 
 - Las subtareas marcadas como completadas reflejan funcionalidad existente en `ToursAyacuchoPeruAPI` y verificada con `dotnet build`.
-- Verificación posterior al reinicio: `dotnet build` y `npm run build` finalizaron correctamente sin errores.
-- Se agregó el proyecto `ToursAyacuchoPeruAPI.Tests` con pruebas unitarias xUnit para `AuthService`, `SiteSettingsService`, consultas de `ReservationService`, comprobantes de `PaymentService` y validadores principales.
-- Última ejecución de pruebas unitarias backend: `dotnet test ToursAyacuchoPeruAPI.Tests\ToursAyacuchoPeruAPI.Tests.csproj --no-restore -p:UseAppHost=false -p:OutputPath=..\codex-test-output\` con resultado **29/29 correctas**.
+- Verificación del 14 de julio de 2026: `dotnet test` y `npm run build` finalizaron correctamente; npm reportó 0 vulnerabilidades.
+- El proyecto `ToursAyacuchoPeruAPI.Tests` contiene pruebas unitarias xUnit y pruebas de integración para autenticación, clientes, reseñas, paquetes, pagos, configuración, validadores, reservas y reportes.
+- Última ejecución backend: **46/46 pruebas correctas**, sin errores ni omisiones.
 - La consulta de reservas con filtro por estado, administración de cuentas/paquetes, reseñas, reportes y notificaciones SMTP con reintentos ya tienen implementación base en el código actual.
-- Permanecen pendientes principalmente las pruebas PBT, pruebas de integración con SQL Server real y validación funcional completa con una base SQL Server configurada.
+- Permanecen pendientes principalmente las pruebas PBT, pruebas con SQL Server real, pruebas de carga y validación manual completa de responsividad y despliegue.
 - La arquitectura vigente del backend es por capas dentro del proyecto API: `Domain`, `Application`, `Infrastructure` y `Presentation`.
 
 ---
